@@ -1,0 +1,50 @@
+stages:
+  - compile
+  - style
+  - test
+  - deploy
+
+
+cat-compile:
+  stage: compile
+  script:
+    - cd src/cat
+    - make
+  artifacts:
+    paths:
+      - src/cat/s21_cat
+    expire_in: 30 days
+
+grep_compile:
+  stage: compile
+  script:
+    - cd src/grep
+    - make
+  artifacts:
+    paths:
+      - src/grep/s21_grep
+    expire_in: 30 days
+
+
+style_check:
+  stage: style
+  script:
+    - cp src/style_check.sh src/cat
+    - cp src/style_check.sh src/grep
+    - cd src/cat
+    - ./style_check.sh
+    - cd ../grep
+    - ./style_check.sh
+
+tests:
+  stage: test
+  script:
+    - ./src/code_test.sh
+  when: on_success
+
+deploy_job:
+  stage: deploy
+  script:
+    - ./src/deploy.sh
+  when: manual
+
